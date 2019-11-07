@@ -13,6 +13,7 @@ module Harvest
     end
 
     def set_source(name, **args)
+      args[:name]      = name
       @inventory[name] = args
     end
 
@@ -42,7 +43,6 @@ module Harvest
       srcs.each do |src|
         src        = src.inject({}){|h, (k,v)| h = h.merge(k.to_sym => v) }
         name       = src.delete(:host)
-        src[:name] = name
         set_source(name, **src)
       end
     end

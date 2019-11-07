@@ -32,19 +32,20 @@ module Harvest
 
     def source(*args)
       args.each do |src|
-        src = case src
-              when /\.y(a)?ml$/
-                factory.yaml(src)
-              when String
-                if File.exist?(src)
-                  factory.dsl(IO.read(src))
-                else
-                  factory.dsl(src)
-                end
-              when Hash
-                name = src.delete(:host)
-                factory.set_source(name, **src)
-              end
+        case src
+        when /\.y(a)?ml$/
+          factory.yaml(src)
+        when String
+          if File.exist?(src)
+            factory.dsl(IO.read(src))
+          else
+            factory.dsl(src)
+          end
+        when Hash
+          pp src
+          name = src.delete(:host)
+          factory.set_source(name, **src)
+        end
       end
     end
 
