@@ -31,7 +31,7 @@ module Harvest
     end
 
     def source(*args)
-      args.each do |src|
+      args.flatten.each do |src|
         case src
         when /\.y(a)?ml$/
           factory.yaml(src)
@@ -42,7 +42,6 @@ module Harvest
             factory.dsl(src)
           end
         when Hash
-          pp src
           name = src.delete(:host)
           factory.set_source(name, **src)
         end
