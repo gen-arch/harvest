@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'singleton'
 require 'uri'
 
@@ -8,8 +10,8 @@ module Harvest
     attr_accessor :templates
 
     def initialize
-      @inventory = Hash.new
-      @templates = Hash.new
+      @inventory = {}
+      @templates = {}
     end
 
     def set_source(name, **args)
@@ -22,11 +24,11 @@ module Harvest
     end
 
     def query(q)
-      list = inventory.map{|k, v| v}
+      list = inventory.map { |_k, v| v }
       return list if q.empty?
 
       list.select do |h|
-        q.any? do |k,v|
+        q.any? do |k, v|
           case v
           when Regexp
             h[k] =~ v
@@ -39,9 +41,10 @@ module Harvest
 
     def yaml(file)
       raise Error, 'not cofnig file' unless File.exist?(file)
+
       srcs = YAML.load_file(file)
       srcs.each do |src|
-        src        = src.inject({}){|h, (k,v)| h = h.merge(k.to_sym => v) }
+        src        = src.inject({}) { |h, (k, v)| h = h.merge(k.to_sym => v) }
         name       = src.delete(:host)
         set_source(name, **src)
       end

@@ -1,118 +1,114 @@
+# frozen_string_literal: true
+
 require 'net/ssh'
 require 'net/ssh/telnet'
 require 'net/ssh/gateway'
 
 module Harvest
   class Connection < Net::SSH::Telnet
-
     attr_reader :name
     attr_reader :delegator
 
     def initialize(template, name, **opts)
-      @name     = name
+      @name = name
 
       @logs      = log_format(opts[:log] || opts[:output_log])
       max_retry  = opts[:max_retry] || 1
-      if opts[:delegator]
-        opts[:delegator].each do |name, bk|
-          define_singleton_method(name, &bk)
-        end
+      opts[:delegator]&.each do |name, bk|
+        define_singleton_method(name, &bk)
       end
 
       opts[:timeout]   ||= template.timeout
       opts[:host_name] ||= name
 
       begin
-        args = Hash.new
-        args["Dump_log"]    = opts[:dump_log]   if opts[:dump_log]
-        args["Prompt"]      = opts[:prompt]     || template.prompt_patten
-        args["Timeout"]     = opts[:timeout]    || 10
-        args["Waittime"]    = opts[:waittime]   || 0
-        args["Terminator"]  = opts[:terminator] || LF
-        args["Binmode"]     = opts[:binmode]    || false
-        args["PTYOptions"]  = opts[:ptyoptions] || {}
+        args = {}
+        args['Dump_log']    = opts[:dump_log]   if opts[:dump_log]
+        args['Prompt']      = opts[:prompt]     || template.prompt_patten
+        args['Timeout']     = opts[:timeout]    || 10
+        args['Waittime']    = opts[:waittime]   || 0
+        args['Terminator']  = opts[:terminator] || LF
+        args['Binmode']     = opts[:binmode]    || false
+        args['PTYOptions']  = opts[:ptyoptions] || {}
 
         if opts[:relay]
           relay             = opts[:relay]
           info              = Harvest.factory.inventory[relay]
-          opts[:port]   = Net::SSH::Gateway.new(relay, nil , info)
+          opts[:port] = Net::SSH::Gateway.new(relay, nil, info)
         end
 
         if opts[:proxy]
-          args["Host"]      = opts[:host_name]
-          args["Port"]      = opts[:port]
-          args["Username"]  = opts[:user]
-          args["Password"]  = opts[:password]
-          args["Proxy"]     = opts[:proxy]
+          args['Host']      = opts[:host_name]
+          args['Port']      = opts[:port]
+          args['Username']  = opts[:user]
+          args['Password']  = opts[:password]
+          args['Proxy']     = opts[:proxy]
         else
           ssh_options       = opts.slice(*Net::SSH::VALID_OPTIONS)
           args['Session']   = Net::SSH.start(name, nil, ssh_options)
         end
 
         super(args)
-      rescue => e
+      rescue StandardError => e
         retry if (max_retry -= 1) > 0
         raise e
       end
     end
 
     def waitfor(options) # :yield: recvdata
-      time_out = @options["Timeout"]
-      waittime = @options["Waittime"]
-      fail_eof = @options["FailEOF"]
+      time_out = @options['Timeout']
+      waittime = @options['Waittime']
+      fail_eof = @options['FailEOF']
 
-      if options.kind_of?(Hash)
-        prompt   = if options.has_key?("Match")
-                     options["Match"]
-                   elsif options.has_key?("Prompt")
-                     options["Prompt"]
-                   elsif options.has_key?("String")
-                     Regexp.new( Regexp.quote(options["String"]) )
+      if options.is_a?(Hash)
+        prompt   = if options.key?('Match')
+                     options['Match']
+                   elsif options.key?('Prompt')
+                     options['Prompt']
+                   elsif options.key?('String')
+                     Regexp.new(Regexp.quote(options['String']))
                    end
-        time_out = options["Timeout"]  if options.has_key?("Timeout")
-        waittime = options["Waittime"] if options.has_key?("Waittime")
-        fail_eof = options["FailEOF"]  if options.has_key?("FailEOF")
+        time_out = options['Timeout']  if options.key?('Timeout')
+        waittime = options['Waittime'] if options.key?('Waittime')
+        fail_eof = options['FailEOF']  if options.key?('FailEOF')
       else
         prompt = options
       end
 
-      if time_out == false
-        time_out = nil
-      end
+      time_out = nil if time_out == false
 
       line = ''
       buf = ''
       rest = ''
       sock = @ssh.transport.socket
 
-      until @ssh.transport.socket.available == 0 && @buf == "" && prompt === line && (@eof || (!sock.closed? && !IO::select([sock], nil, nil, waittime)))
+      until @ssh.transport.socket.available == 0 && @buf == '' && prompt === line && (@eof || (!sock.closed? && !IO.select([sock], nil, nil, waittime)))
         # @buf may have content if it was processed by Net::SSH before #waitfor
         # was called
         # The prompt is checked in case a waittime was specified, we've already
         # seen the prompt, but a protocol-level packet came through during the
         # above IO::select, causing us to reprocess
-        if @buf == '' && (@ssh.transport.socket.available == 0) && !(prompt === line) && !IO::select([sock], nil, nil, time_out)
-          raise Net::ReadTimeout, "timed out while waiting for more data"
+        if @buf == '' && (@ssh.transport.socket.available == 0) && !(prompt === line) && !IO.select([sock], nil, nil, time_out)
+          raise Net::ReadTimeout, 'timed out while waiting for more data'
         end
+
         _process_ssh
-        if @buf != ""
-          c = @buf; @buf = ""
-          @dumplog.log_dump('<', c) if @options.has_key?("Dump_log")
+        if @buf != ''
+          c = @buf; @buf = ''
+          @dumplog.log_dump('<', c) if @options.key?('Dump_log')
           buf = rest + c
           rest = ''
-          unless @options["Binmode"]
+          unless @options['Binmode']
             if pt = buf.rindex(/\r\z/no)
-              buf = buf[0 ... pt]
-              rest = buf[pt .. -1]
+              buf = buf[0...pt]
+              rest = buf[pt..-1]
             end
             buf.gsub!(/#{EOL}/no, "\n")
           end
 
-          @log.print(buf) if @options.has_key?("Output_log")
-          if @logs
-            @logs.each do |log|
-              log.print(buf)
-            end
+          @log.print(buf) if @options.key?('Output_log')
+          @logs&.each do |log|
+            log.print(buf)
           end
 
           line += buf
@@ -120,6 +116,7 @@ module Harvest
         elsif @eof # End of file reached
           break if prompt === line
           raise EOFError if fail_eof
+
           if line == ''
             line = nil
             yield nil if block_given?
@@ -132,6 +129,7 @@ module Harvest
 
     def log_format(log)
       return [] unless log
+
       logs = log.is_a?(Array) ? log : [log]
 
       logs.map do |log|

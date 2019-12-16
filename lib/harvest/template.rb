@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 require 'harvest/connection'
 
 module Harvest
   class Template
-
     DEFAULT_TIMEOUT  = 10
-    DEFAULT_PROMPT   = /[$%#>] ?\z/n
+    DEFAULT_PROMPT   = /[$%#>] ?\z/n.freeze
 
     attr_reader :methods
     attr_reader :prompts
@@ -12,13 +13,14 @@ module Harvest
 
     def initialize(name)
       @name    = name
-      @prompts = Array.new
+      @prompts = []
       @timeout = DEFAULT_TIMEOUT
-      @methods = Hash.new
+      @methods = {}
     end
 
     def prompt(expect = nil, &block)
       return [[DEFAULT_PROMPT, nil]] if expect.nil? && @prompts.empty?
+
       @prompts << [Regexp.new(expect.to_s), block] if expect
       @prompts
     end
@@ -34,7 +36,7 @@ module Harvest
     def build(name, **opts)
       klass = Class.new(Harvest.const_get('Connection'))
       klass.class_exec(self) do |template|
-        template.methods.each {|name, block| define_method(name, &block) }
+        template.methods.each { |name, block| define_method(name, &block) }
       end
       klass.new(self, name, **opts)
     end

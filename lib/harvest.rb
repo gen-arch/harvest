@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'yaml'
 
 require 'harvest/version'
@@ -8,18 +10,21 @@ module Harvest
   class Error < StandardError; end
   class << self
     def get(name, **opts, &block)
-      begin
-        opts     = factory.inventory[name].merge(opts)
-        type     = opts[:type]
-        template = factory.templates[type]
-        session  = template.build(name, **opts)
+      opts     = factory.inventory[name].merge(opts)
+      type     = opts[:type]
+      template = factory.templates[type]
+      session  = template.build(name, **opts)
 
-        return session unless block
-        yield  session
-        session.close rescue nil
-      rescue => err
-        raise Error.new(err)
+      return session unless block
+
+      yield  session
+      begin
+        session.close
+      rescue StandardError
+        nil
       end
+    rescue StandardError => e
+      raise Error, e
     end
 
     def list(**query)
@@ -58,7 +63,7 @@ module Harvest
         return
       end
 
-      templates = templates.map{|path| Dir.exist?(path) ? Dir.glob(File.join(path, '*.rb')) : path }.flatten
+      templates = templates.map { |path| Dir.exist?(path) ? Dir.glob(File.join(path, '*.rb')) : path }.flatten
       templates.each do |path|
         name     ||= File.basename(path, '.rb').scan(/\w+/).join('_').to_sym
         text       = IO.read(path)
@@ -70,6 +75,7 @@ module Harvest
     end
 
     private
+
     def factory
       @factory ||= Factory.instance
     end
