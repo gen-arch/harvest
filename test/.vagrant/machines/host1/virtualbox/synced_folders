@@ -1,0 +1,1 @@
+{"virtualbox":{"/sync":{"guestpath":"/sync","hostpath":"/Users/itotoshifumi/scripts/vagrant/sync","disabled":false,"__vagrantfile":true},"/vagrant":{"guestpath":"/vagrant","hostpath":"/Users/itotoshifumi/scripts/ruby/harvest/test","disabled":false,"__vagrantfile":true}}}
