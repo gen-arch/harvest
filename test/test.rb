@@ -11,14 +11,9 @@ Harvest.configure do
   end
 end
 
-hosts = ['host1', 'host2']
 
-hosts.each do |host|
-  s = Harvest.get(host, log: "log/#{host}.log")
+s = Harvest.get("host1", log: "log/#{host}.log")
 
-  puts s.cmd('ls')
-  puts s.cmd('hostname')
-  puts s.iplist
-  s.close
-end
+puts s.cmd('hostname')
+s.close
 
