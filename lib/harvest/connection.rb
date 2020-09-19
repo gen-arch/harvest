@@ -56,7 +56,7 @@ module Harvest
         @ssh = Net::SSH.start(nil, nil, opts)
         @close_all = true
       else
-        logger("Trying " + @opts[:host] + "...\n", &blk)
+        logger("Trying#{@opts[:host]}...\n", &blk)
 
         begin
           ssh_options = opts.slice(*Net::SSH::VALID_OPTIONS)
@@ -69,16 +69,16 @@ module Harvest
           raise
         end
 
-        logger("Connected to " + @opts[:host] + ".\n")
+        logger("Connected to #{@opts[:host]}.\n")
       end
 
-      start_ssh_connection
+      start_ssh_connection(&blk)
     rescue StandardError => err
       retry if (max_retry -= 1) > 0
       raise err
     end
 
-    def start_ssh_connection
+    def start_ssh_connection(&blk)
       @buf = ""
       @eof = false
       @channel = nil
@@ -223,9 +223,9 @@ module Harvest
 
       unless @log
         @log =
-          case file
-          when IO     then file
-          when String then File.open(file, 'a+')
+          case @opts[:log]
+          when IO     then @opts[:log]
+          when String then File.open(@opts[:log], 'a+')
           end
         @log.sync = true
         @log.binmode

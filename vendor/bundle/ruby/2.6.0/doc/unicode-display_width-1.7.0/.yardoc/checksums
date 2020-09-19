@@ -1,0 +1,5 @@
+lib/unicode/display_width.rb afa06d1d23d1f0ad36ed6063722aafa3b68d0992
+lib/unicode/display_width/index.rb abb7eca54062eb44edd8ed393be3568b66879bd0
+lib/unicode/display_width/constants.rb 0b87b07f7b2fc27147962580426f6b6af62ca08c
+lib/unicode/display_width/string_ext.rb 2c1ba10e4379801b744346e6367fb554d6b78681
+lib/unicode/display_width/no_string_ext.rb 81446ed47bc7c8adb526f96bcc72c9b517e961ba

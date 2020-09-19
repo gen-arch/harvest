@@ -1,0 +1,7 @@
+lib/bcrypt_pbkdf.rb 01ceff4a106e6a892fc7afb06863ce8e1fe60399
+ext/mri/blowfish.c 1b77f742a5332a26f827e561c975fb9266cd8b6f
+ext/mri/extconf.rb 6431a744f7fff4d0778031fb3c475ea1ba347e92
+ext/mri/hash_sha512.c bb52cec7b34d1945e8e75b382a7c2194a3abbfbd
+ext/mri/bcrypt_pbkdf.c 1e19df5d7c835da353d0d47677becc1b39ab9a52
+ext/mri/explicit_bzero.c 3aab03e5807dd2c4d9ffda2f1816c2ebea9fbe01
+ext/mri/bcrypt_pbkdf_ext.c 4d9a70f344d8ce1486e26d56f66ba28c69474a0e

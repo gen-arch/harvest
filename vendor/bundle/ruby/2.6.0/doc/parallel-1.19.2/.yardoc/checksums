@@ -1,0 +1,3 @@
+lib/parallel.rb 7975b88112dbb10739f4d7949d90581030895db0
+lib/parallel/version.rb fd03246074f17c8ed3f074a8c2b7071cc8ce9c95
+lib/parallel/processor_count.rb 6a89d8c08a9b12bd0dd66e1edb681d18431f326c

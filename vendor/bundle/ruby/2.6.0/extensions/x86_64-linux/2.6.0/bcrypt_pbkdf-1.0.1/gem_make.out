@@ -1,0 +1,19 @@
+current directory: /home/gen/scripts/ruby/harvest/vendor/bundle/ruby/2.6.0/gems/bcrypt_pbkdf-1.0.1/ext/mri
+/home/gen/.anyenv/envs/rbenv/versions/2.6.5/bin/ruby -I /home/gen/.anyenv/envs/rbenv/versions/2.6.5/lib/ruby/2.6.0 -r ./siteconf20200920-9191-p1wxy.rb extconf.rb
+creating Makefile
+
+current directory: /home/gen/scripts/ruby/harvest/vendor/bundle/ruby/2.6.0/gems/bcrypt_pbkdf-1.0.1/ext/mri
+make "DESTDIR=" clean
+
+current directory: /home/gen/scripts/ruby/harvest/vendor/bundle/ruby/2.6.0/gems/bcrypt_pbkdf-1.0.1/ext/mri
+make "DESTDIR="
+compiling bcrypt_pbkdf.c
+compiling bcrypt_pbkdf_ext.c
+compiling blowfish.c
+compiling explicit_bzero.c
+compiling hash_sha512.c
+linking shared-object bcrypt_pbkdf_ext.so
+
+current directory: /home/gen/scripts/ruby/harvest/vendor/bundle/ruby/2.6.0/gems/bcrypt_pbkdf-1.0.1/ext/mri
+make "DESTDIR=" install
+/usr/bin/install -c -m 0755 bcrypt_pbkdf_ext.so ./.gem.20200920-9191-1rnxlm0

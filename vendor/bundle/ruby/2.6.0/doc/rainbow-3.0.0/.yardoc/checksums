@@ -1,0 +1,11 @@
+lib/rainbow.rb 9581bd7dd7b91ab1cf1cad45b7bb58c3f8a2c4ab
+lib/rainbow/color.rb 12dfcfdf09ddf25f4ae9ee399ea72ef01886a457
+lib/rainbow/global.rb ceb9d254a786ff0aeeabf24834e70fe15f3b301f
+lib/rainbow/version.rb e68ce4cbe0a93970c47d578395fb292b7a4f7354
+lib/rainbow/wrapper.rb c1072240fe0d9cb1577ee4559822265b2fc7a322
+lib/rainbow/presenter.rb 51a7822a63e850675df49443d9efdc39564c8b4e
+lib/rainbow/ext/string.rb a0f63cbca34461b26e3450396ad3906f2b9268c2
+lib/rainbow/refinement.rb 8dafd232805c0289c0f8fc2e91f031157daaa2d3
+lib/rainbow/string_utils.rb a998f7360d2f7c9de2ca693f7e19eb8260794226
+lib/rainbow/null_presenter.rb a3c703f72a4b900501d80e123dcfc551d4643614
+lib/rainbow/x11_color_names.rb 87e131328d602ef4b364236819e0ca35fbe7f0bb
