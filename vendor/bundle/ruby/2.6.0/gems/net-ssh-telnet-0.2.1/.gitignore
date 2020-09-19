@@ -1,8 +1,0 @@
-examples/dump.log
-examples/output.log
-pkg
-doc
-*.swp
-/.yardoc
-/.bundle
-/Gemfile.lock
