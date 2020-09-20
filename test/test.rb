@@ -12,7 +12,7 @@ Harvest.configure do
 end
 
 
-s = Harvest.get("host1", log: "log/#{host}.log")
+s = Harvest.get("host1", log: "log/test.log")
 
 puts s.cmd('hostname')
 s.close

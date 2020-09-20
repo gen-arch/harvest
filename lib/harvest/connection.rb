@@ -79,8 +79,8 @@ module Harvest
     end
 
     def start_ssh_connection(&blk)
-      @buf = ""
-      @eof = false
+      @buf     = ""
+      @eof     = false
       @channel = nil
       @ssh.open_channel do |channel|
         channel.on_data { |ch,data| @buf << data }
