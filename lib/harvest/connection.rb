@@ -30,7 +30,7 @@ module Harvest
       opts[:ptyoptions] ||= {}
       opts[:binmode]    ||= false
       opts[:timeout]    ||= template.timeout
-      opts[:log]        ||= $stdout
+      opts[:log]        ||= []
 
       @opts      = opts
       @name      = name
