@@ -56,11 +56,17 @@ module Harvest
         @ssh = Net::SSH.start(nil, nil, opts)
         @close_all = true
       else
-        logger("Trying#{@opts[:host]}...\n", &blk)
+        logger("Trying#{name}...\n", &blk)
 
         begin
           ssh_options = opts.slice(*Net::SSH::VALID_OPTIONS)
-          @ssh        = Net::SSH.start(name, nil, ssh_options)
+
+          if @opts[:config]
+            ssh_options.delete(:host_name)
+            @ssh = Net::SSH.start(@opts[:host_name], nil, ssh_options)
+          else
+            @ssh = Net::SSH.start(name, nil, ssh_options)
+          end
           @close_all  = true
         rescue TimeoutError
           raise TimeoutError, "timed out while opening a connection to the host"
@@ -69,7 +75,7 @@ module Harvest
           raise
         end
 
-        logger("Connected to #{@opts[:host]}.\n")
+        logger("Connected to #{name}.\n")
       end
 
       start_ssh_connection(&blk)
