@@ -31,6 +31,10 @@ module Harvest
       factory.query(query)
     end
 
+    def find(**query)
+      list(**query).first
+    end
+
     def configure(&block)
       instance_eval(&block)
     end

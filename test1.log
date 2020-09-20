@@ -1,0 +1,10 @@
+Last login: Sun Sep 20 13:48:06 2020 from localhost
+
+       __|  __|_  )
+       _|  (     /   Amazon Linux 2 AMI
+      ___|\___|___|
+
+https://aws.amazon.com/amazon-linux-2/
+]0;ec2-user@prd-bastion:~[?1034h[ec2-user@prd-bastion ~]$ hostname
+prd-bastion
+]0;ec2-user@prd-bastion:~[ec2-user@prd-bastion ~]$ 

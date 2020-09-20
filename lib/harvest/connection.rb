@@ -21,19 +21,21 @@ module Harvest
     end
 
     def initialize(template, name, **opts, &blk) # :yield: mesg
-      @name = name
-      @opts = opts
+      opts[:host_name]  ||= name
+      opts[:port]       ||= 22
+      opts[:prompt]     ||= /[$%#>] \z/n
+      opts[:timeout]    ||= 10
+      opts[:waittime]   ||= 0
+      opts[:terminator] ||= LF
+      opts[:ptyoptions] ||= {}
+      opts[:binmode]    ||= false
+      opts[:timeout]    ||= template.timeout
+      opts[:log]        ||= $stdout
 
-      @max_retry         = opts[:max_retry] || 1
-      @opts[:host_name]  ||= name
-      @opts[:port]       ||= 22
-      @opts[:prompt]     ||= /[$%#>] \z/n
-      @opts[:timeout]    ||= 10
-      @opts[:waittime]   ||= 0
-      @opts[:terminator] ||= LF
-      @opts[:ptyoptions] ||= {}
-      @opts[:binmode]    ||= false
-      @opts[:timeout]    ||= template.timeout
+      @opts      = opts
+      @name      = name
+      @max_retry = opts[:max_retry] || 1
+      @loggers   = [@opts[:log]].flatten.uniq.reduce({}){ |a, e| a.merge(e => build_log(e) ) }
 
       @opts[:delegator]&.each do |name, bk|
         define_singleton_method(name, &bk)
@@ -56,7 +58,6 @@ module Harvest
         @ssh = Net::SSH.start(nil, nil, opts)
         @close_all = true
       else
-        logger("Trying#{name}...\n", &blk)
 
         begin
           ssh_options = opts.slice(*Net::SSH::VALID_OPTIONS)
@@ -72,16 +73,14 @@ module Harvest
         rescue TimeoutError
           raise TimeoutError, "timed out while opening a connection to the host"
         rescue
-          logger($ERROR_INFO.to_s + "\n")
+          write_log($ERROR_INFO.to_s + "\n")
           raise
         end
-
-        logger("Connected to #{name}.\n")
       end
 
       start_ssh_connection(&blk)
     rescue StandardError => err
-      retry if (max_retry -= 1) > 0
+      retry if (@max_retry -= 1) > 0
       raise err
     end
 
@@ -112,6 +111,11 @@ module Harvest
     end
 
     def close
+      @loggers.each do |_, logger|
+        next if [$stdout, $stderr, nil].include?(logger)
+        logger.close
+      end
+
       @channel.close if @channel
       @channel = nil
       @ssh.close if @close_all and @ssh
@@ -171,8 +175,9 @@ module Harvest
 
           line += buf
 
-          @log.print(buf) if @opts[:log]
-          yield buf if block_given?
+          unless buf == @string
+            write_log(buf)
+          end
 
         elsif @eof # End of file reached
           break if prompt === line
@@ -205,6 +210,7 @@ module Harvest
     end
 
     def puts(string)
+      @string = string + "\n"
       self.print(string + "\n")
     end
 
@@ -222,7 +228,53 @@ module Harvest
       end
     end
 
+    def interact!
+      loop do
+        com = $stdin.gets.strip
+
+        if com == "exit"
+          close
+          exit 0
+        else
+          self.puts(com)
+          waitfor
+        end
+      end
+    end
+
+    def enable_log(log = $stdout)
+      @loggers.update(log => build_log(log))
+      if block_given?
+        yield
+        disable_log(log)
+      end
+    end
+
+    def disable_log(log = $stdout)
+      @loggers.delete(log)
+      if block_given?
+        yield
+        enable_log(log)
+      end
+    end
+
     private
+    def write_log(text)
+      @loggers.each{ |_, logger| logger.syswrite(text) if logger }
+    end
+
+    def build_log(log)
+      case log
+      when String
+        FileUtils.mkdir_p(File.dirname(log))
+        File.open(log, 'a+').tap do |logger|
+          logger.binmode
+          logger.sync = true
+        end
+      when IO, StringIO
+        log
+      end
+    end
 
     def logger(mes)
       yield mes if block_given?

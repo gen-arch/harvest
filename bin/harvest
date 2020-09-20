@@ -1,0 +1,6 @@
+#! /usr/bin/env ruby
+
+require 'harvest'
+require 'harvest/cli'
+
+Harvest::CLI.run

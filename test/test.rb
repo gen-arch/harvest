@@ -1,4 +1,5 @@
 require 'harvest'
+require 'harvest/cli'
 
 Harvest.configure do
   source   "centos7 'host1',    'ssh://vagrant:vagrant@localhost',     port: 2222"
@@ -12,8 +13,11 @@ Harvest.configure do
   end
 end
 
+#pp Harvest.find(name: "bastion")
 
-Harvest.get("bastion", log: STDOUT) do |s|
-  s.cmd('hostname')
-  s.close
-end
+#Harvest.get("bastion", log: [STDOUT, "test1.log"]) do |s|
+#  s.cmd('hostname')
+#  s.close
+#end
+
+Harvest::CLI.run
