@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    harvest (1.0.1)
+    harvest (1.2.0)
       bcrypt_pbkdf
       ed25519
       net-ssh
