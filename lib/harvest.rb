@@ -54,7 +54,7 @@ module Harvest
           name = src.delete(:name)
           factory.set_source(name, **src)
         when Array
-          src.each do |s||
+          src.each do |s|
             name = s.delete(:name)
             factory.set_source(name, **s)
           end
