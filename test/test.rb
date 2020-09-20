@@ -13,7 +13,7 @@ Harvest.configure do
 end
 
 
-Harvest.get("bastion", log: "log/test.log") do |s|
-  pp s.cmd('hostname')
+Harvest.get("bastion", log: STDOUT) do |s|
+  s.cmd('hostname')
   s.close
 end

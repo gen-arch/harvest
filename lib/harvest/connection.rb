@@ -67,6 +67,7 @@ module Harvest
           else
             @ssh = Net::SSH.start(name, nil, ssh_options)
           end
+
           @close_all  = true
         rescue TimeoutError
           raise TimeoutError, "timed out while opening a connection to the host"
