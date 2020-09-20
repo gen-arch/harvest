@@ -8,7 +8,6 @@
 Vagrant.configure("2") do |config|
   config.vm.box      = "bento/centos-7.2"
   config.vm.hostname = "cent7"
-  config.vm.synced_folder "~/scripts/vagrant/sync", "/sync"
 
   config.vm.define "host1" do |c|
     c.vm.hostname = "host1"
